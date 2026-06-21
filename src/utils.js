@@ -12,6 +12,7 @@ export function asArray(value) {
 
 export function getProperty(source, path) {
   if (!path) return source;
+  if (Object.prototype.hasOwnProperty.call(source ?? {}, path)) return source[path];
   const parts = String(path).split(".");
   let cursor = source;
   for (const part of parts) {
@@ -35,4 +36,3 @@ export function makeError(message, details = {}) {
   error.details = details;
   return error;
 }
-

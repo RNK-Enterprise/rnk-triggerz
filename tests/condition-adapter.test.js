@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { ACTION_TYPES } from "../src/constants.js";
-import { ConditionAdapter, makeEffectData } from "../src/ConditionAdapter.js";
+import { ConditionAdapter, conditionAliases, effectDocuments, effectMatches, makeEffectData } from "../src/ConditionAdapter.js";
 
 function createActor() {
   const actor = {
@@ -43,13 +43,28 @@ test("makeEffectData builds stable ActiveEffect data", () => {
 test("ConditionAdapter resolves actors, statuses, and existing effects", () => {
   const adapter = new ConditionAdapter({ config: { statusEffects: [{ id: "stunned" }] } });
   const actor = { effects: [{ statuses: new Set(["stunned"]) }] };
+  const iterableEffects = { *[Symbol.iterator]() { yield { id: "iterable-effect" }; } };
   assert.equal(adapter.toActor({ actor }), actor);
   assert.equal(adapter.toActor(actor), actor);
   assert.deepEqual(adapter.getStatus("stunned"), { id: "stunned" });
   assert.equal(adapter.getStatus("missing"), undefined);
   assert.equal(new ConditionAdapter({ config: null }).getStatus("missing"), undefined);
   assert.equal(new ConditionAdapter({ config: {} }).getStatus("missing"), undefined);
+  assert.deepEqual(effectDocuments(null), []);
+  assert.deepEqual(effectDocuments([{ id: "array-effect" }]), [{ id: "array-effect" }]);
+  assert.deepEqual(effectDocuments(new Map([["map-effect", { id: "map-effect" }]])), [{ id: "map-effect" }]);
+  assert.deepEqual(effectDocuments({ contents: [{ id: "contents-array-effect" }] }), [{ id: "contents-array-effect" }]);
+  assert.deepEqual(effectDocuments({ contents: new Map([["contents-map-effect", { id: "contents-map-effect" }]]) }), [{ id: "contents-map-effect" }]);
+  assert.deepEqual(effectDocuments(iterableEffects), [{ id: "iterable-effect" }]);
+  assert.deepEqual(effectDocuments({ id: "single-effect" }), [{ id: "single-effect" }]);
+  assert.deepEqual(conditionAliases({ id: "brulure", name: "Brulure" }, { label: "Burning" }), ["brulure", "Brulure", "Burning"]);
+  assert.equal(effectMatches({ name: "Brulure" }, { id: "brulure", name: "Brulure" }), true);
+  assert.equal(effectMatches({ label: "Burning" }, "burning", { label: "Burning" }), true);
+  assert.equal(effectMatches({ statuses: ["burning"] }, "burning"), true);
+  assert.equal(effectMatches({ getFlag: () => "burning" }, "burning"), true);
+  assert.equal(effectMatches({ name: "Cold" }, "burning"), false);
   assert.equal(adapter.hasEffect(actor, "stunned"), true);
+  assert.equal(adapter.hasEffect({ effects: new Map([["e", { statuses: ["mapped"] }]]) }, "mapped"), true);
   assert.equal(adapter.hasEffect({ effects: [{ statuses: ["burning"] }] }, "burning"), true);
   assert.equal(adapter.hasEffect({ effects: [{ getFlag: () => "flagged" }] }, "flagged"), true);
   assert.equal(adapter.hasEffect({ effects: [{ statuses: [], getFlag: () => "other", name: "other" }] }, "missing"), false);
@@ -88,6 +103,11 @@ test("ConditionAdapter removes through toggle, fallback delete, and no-op path",
   const actor = createActor();
   actor.effects = [{ id: "e1", statuses: ["burning"] }, { id: null, statuses: ["burning"] }];
   assert.deepEqual(await adapter.remove(actor, "burning"), ["e1"]);
+  actor.effects = new Map([["e2", { id: "e2", statuses: ["burning"] }]]);
+  assert.deepEqual(await adapter.remove(actor, "burning"), ["e2"]);
+  actor.effects = [{ id: "e4", name: "Brulure" }];
+  assert.deepEqual(await adapter.remove(actor, { id: "brulure", name: "Brulure" }), ["e4"]);
+  await assert.rejects(() => adapter.remove({ effects: [{ id: "e3", statuses: ["burning"] }] }, "burning"), /cannot delete/);
 });
 
 test("ConditionAdapter toggles and runs actions", async () => {

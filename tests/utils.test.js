@@ -20,8 +20,11 @@ test("property helpers read nested paths safely", () => {
   const source = { system: { hp: { value: 4 } }, empty: null };
   assert.equal(getProperty(source, ""), source);
   assert.equal(getProperty(source, "system.hp.value"), 4);
+  assert.equal(getProperty({ "system.hp.value": 7 }, "system.hp.value"), 7);
+  assert.equal(getProperty(null, "system.hp.value"), undefined);
   assert.equal(getProperty(source, "empty.value"), undefined);
   assert.equal(hasProperty(source, "system.hp.value"), true);
+  assert.equal(hasProperty({ "system.hp.value": 7 }, "system.hp.value"), true);
   assert.equal(hasProperty(source, "system.hp.missing"), false);
 });
 

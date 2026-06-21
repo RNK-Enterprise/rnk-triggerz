@@ -9,6 +9,33 @@ function conditionName(condition, status) {
   return typeof condition === "string" ? status?.name ?? condition : condition?.name ?? status?.name ?? condition?.id;
 }
 
+export function conditionAliases(condition, status) {
+  const aliases = [
+    conditionId(condition),
+    typeof condition === "string" ? undefined : condition?.name,
+    status?.name,
+    status?.label
+  ];
+  return [...new Set(aliases.filter(Boolean).map(String))];
+}
+
+export function effectDocuments(effects) {
+  if (!effects) return [];
+  if (Array.isArray(effects)) return effects;
+  if (typeof effects.values === "function") return [...effects.values()];
+  if (Array.isArray(effects.contents)) return effects.contents;
+  if (typeof effects.contents?.values === "function") return [...effects.contents.values()];
+  if (typeof effects[Symbol.iterator] === "function") return [...effects];
+  return [effects];
+}
+
+export function effectMatches(effect, condition, status) {
+  const aliases = conditionAliases(condition, status);
+  const statuses = effect.statuses instanceof Set ? [...effect.statuses] : asArray(effect.statuses);
+  const flagConditionId = effect.getFlag?.(MODULE_ID, "conditionId");
+  return aliases.some((alias) => statuses.includes(alias) || flagConditionId === alias || effect.name === alias || effect.label === alias);
+}
+
 export function makeEffectData(condition, status, options = {}) {
   const id = conditionId(condition);
   return {
@@ -41,11 +68,8 @@ export class ConditionAdapter {
     return this.config?.statusEffects?.find?.((effect) => effect.id === id);
   }
 
-  hasEffect(actor, id) {
-    return asArray(actor?.effects).some((effect) => {
-      const statuses = effect.statuses instanceof Set ? [...effect.statuses] : asArray(effect.statuses);
-      return statuses.includes(id) || effect.getFlag?.("rnk-triggerz", "conditionId") === id || effect.name === id;
-    });
+  hasEffect(actor, condition) {
+    return effectDocuments(actor?.effects).some((effect) => effectMatches(effect, condition, this.getStatus(conditionId(condition))));
   }
 
   assignedConditionIds(target) {
@@ -107,11 +131,14 @@ export class ConditionAdapter {
     if (status && typeof actor.toggleStatusEffect === "function") {
       return actor.toggleStatusEffect(id, { active: false, overlay: false });
     }
-    const removeIds = asArray(actor.effects)
-      .filter((effect) => this.hasEffect({ effects: [effect] }, id))
+    const removeIds = effectDocuments(actor.effects)
+      .filter((effect) => effectMatches(effect, condition, status))
       .map((effect) => effect.id)
       .filter(Boolean);
     if (!removeIds.length) return [];
+    if (typeof actor.deleteEmbeddedDocuments !== "function") {
+      throw makeError("Actor cannot delete ActiveEffect documents.", { id, removeIds });
+    }
     return actor.deleteEmbeddedDocuments("ActiveEffect", removeIds);
   }
 

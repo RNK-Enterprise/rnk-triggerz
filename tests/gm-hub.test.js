@@ -147,7 +147,7 @@ test("GM hub context builds usable render data", () => {
     ]
   });
   const context = buildGMHubContext({ dataManager: createStore(), env });
-  assert.equal(context.version, "1.0.0");
+  assert.equal(context.version, "1.0.1");
   assert.equal(context.moduleMode, "localized:RNKTRIGGERZ.GMHub.SystemAgnostic");
   assert.equal("systemId" in context, false);
   assert.equal(context.mode, "GM");

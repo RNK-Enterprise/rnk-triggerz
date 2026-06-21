@@ -10,18 +10,50 @@ export const COMPARATORS = Object.freeze({
   [OPERATORS.GTE]: (left, right) => left >= right
 });
 
+export function isNumericValue(value) {
+  if (value === "" || value === null || value === undefined) return false;
+  return Number.isFinite(Number(value));
+}
+
+export function comparableValues(left, right) {
+  if (isNumericValue(left) && isNumericValue(right)) return [Number(left), Number(right)];
+  return [left, right];
+}
+
+export function compareValues(operator, left, right) {
+  return COMPARATORS[operator](...comparableValues(left, right));
+}
+
 export function coerceValue(value, exemplar) {
   if (typeof exemplar === "number") return Number(value);
   if (typeof exemplar === "boolean") return value === true || value === "true";
   return String(value);
 }
 
-export function resolveTriggerRightValue(trigger, entity, leftValue) {
-  const rawValue = String(trigger.value ?? "");
+export function resolvePathValue(entity, update, path) {
+  if (hasProperty(update, path)) return getProperty(update, path);
+  return getProperty(entity, path);
+}
+
+export function resolveUpdatePath(update, path) {
+  if (hasProperty(update, path)) return path;
+  if (String(path).startsWith("system.")) {
+    const systemRelativePath = String(path).slice("system.".length);
+    if (hasProperty(update, systemRelativePath)) return systemRelativePath;
+  }
+  return undefined;
+}
+
+export function resolveTriggerRightValue(trigger, entity, leftValue, update = {}) {
+  const rawValue = String(trigger.value ?? "").trim();
   if (rawValue.endsWith("%")) {
-    const base = Number(getProperty(entity, trigger.comparePath));
+    const base = Number(resolvePathValue(entity, update, trigger.comparePath));
     return base * (Number(rawValue.slice(0, -1)) / 100);
   }
+  if (rawValue && (hasProperty(update, rawValue) || hasProperty(entity, rawValue))) {
+    return resolvePathValue(entity, update, rawValue);
+  }
+  if (!rawValue && trigger.comparePath) return resolvePathValue(entity, update, trigger.comparePath);
   return coerceValue(rawValue, leftValue);
 }
 
@@ -47,26 +79,36 @@ export function evaluateTrigger(trigger, entity, update) {
   const prepared = normalizeTrigger(trigger);
   if (prepared.pcOnly && !entity?.hasPlayerOwner) return false;
   if (prepared.npcOnly && entity?.hasPlayerOwner) return false;
-  if (!hasProperty(update, prepared.path)) return false;
-  const leftValue = getProperty(update, prepared.path);
+  const updatePath = resolveUpdatePath(update, prepared.path);
+  if (!updatePath) return false;
+  const leftValue = getProperty(update, updatePath);
   if (prepared.notZero && leftValue === 0) return false;
-  const rightValue = resolveTriggerRightValue(prepared, entity, leftValue);
-  return COMPARATORS[prepared.operator](leftValue, rightValue);
+  const rightValue = resolveTriggerRightValue(prepared, entity, leftValue, update);
+  return compareValues(prepared.operator, leftValue, rightValue);
 }
 
 export class TriggerEngine {
-  constructor({ adapter, macroRunner = async () => undefined } = {}) {
+  constructor({ adapter, macroRunner = async () => undefined, conditionResolver = (condition) => condition } = {}) {
     this.adapter = adapter;
     this.macroRunner = macroRunner;
+    this.conditionResolver = conditionResolver;
   }
 
-  async processUpdate(entity, update, triggers = []) {
+  resolveAction(action) {
+    if (!action.condition) return action;
+    return {
+      ...action,
+      condition: this.conditionResolver(action.condition) ?? action.condition
+    };
+  }
+
+  async processUpdate(entity, update, triggers = [], actionTarget = entity) {
     const matched = [];
     for (const trigger of triggers.map(normalizeTrigger)) {
       if (!evaluateTrigger(trigger, entity, update)) continue;
       matched.push(trigger);
       for (const action of trigger.actions) {
-        await this.adapter.runAction(entity, action, this.macroRunner);
+        await this.adapter.runAction(actionTarget, this.resolveAction(action), this.macroRunner);
       }
     }
     return matched;
@@ -88,4 +130,3 @@ export function createDefaultTrigger(id, path, value, condition) {
     ]
   });
 }
-

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.1 - 2026-06-21
+
+- Added trigger comparisons where the value can resolve from an actor data path.
+- Fixed CSB trigger evaluation for flat Foundry update keys and numeric string comparisons.
+- Fixed token HUD actor-delta updates so token bar value edits trigger the same rules as sheet edits.
+- Fixed condition removal for Foundry ActiveEffect collections.
+- Fixed trigger actions so saved/custom condition data is resolved before apply, remove, or toggle.
+- Fixed path-value remove triggers for token delta actor data.
+- Fixed path-value remove triggers when CSB computed labels only exist on live prepared actor data.
+- Fixed CSB token-bar updates that arrive as system-relative actor paths such as `props.HP`.
+
 ## 1.0.0
 
 - RNK Triggerz v1 release foundation.
