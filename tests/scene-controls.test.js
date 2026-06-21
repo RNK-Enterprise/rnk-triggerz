@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createControlGroup, createOpenHubTool, injectControlGroup, registerSceneControlHook } from "../src/hooks/UIHooks.js";
+import { createControlGroup, createOpenHubTool, injectControlGroup, registerSceneControlHook, sceneControlEnabled } from "../src/hooks/UIHooks.js";
 
 test("scene tool opens hub only on active change", () => {
   const calls = [];
@@ -40,9 +40,20 @@ test("registerSceneControls handles missing Hooks and registers callback", () =>
     }
   };
   const env = { Hooks: hooks, game: { i18n: { has: () => false } } };
-  registerSceneControlHook(env, () => ({ uiManager: { openGMHub: () => undefined } }));
+  assert.equal(sceneControlEnabled({ dataManager: { get: () => false } }), false);
+  assert.equal(sceneControlEnabled({ dataManager: { get: () => true } }), true);
+  assert.equal(sceneControlEnabled({ dataManager: {} }), true);
+  registerSceneControlHook(env, () => ({ dataManager: { get: () => true }, uiManager: { openGMHub: () => undefined } }));
   assert.equal(hooks.name, "getSceneControlButtons");
   const controls = [];
   hooks.callback(controls);
   assert.equal(controls[0].name, "rnk-triggerz");
+  hooks.callback = null;
+  registerSceneControlHook(env, () => ({ dataManager: { get: () => false }, uiManager: { openGMHub: () => undefined } }));
+  const disabledControls = [];
+  assert.deepEqual(hooks.callback(disabledControls), disabledControls);
+  assert.deepEqual(disabledControls, []);
+  registerSceneControlHook(env, () => null);
+  const missingControls = [];
+  assert.deepEqual(hooks.callback(missingControls), missingControls);
 });

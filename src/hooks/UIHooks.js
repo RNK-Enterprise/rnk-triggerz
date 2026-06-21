@@ -1,4 +1,4 @@
-import { MODULE_ID } from "../constants.js";
+import { MODULE_ID, SETTING_KEYS } from "../constants.js";
 import { localize } from "../utils.js";
 
 export function createOpenHubTool(triggerz, env = globalThis) {
@@ -38,11 +38,16 @@ export function injectControlGroup(controls, group) {
   return controls;
 }
 
+export function sceneControlEnabled(triggerz) {
+  if (!triggerz?.dataManager || typeof triggerz.dataManager.get !== "function") return true;
+  return triggerz.dataManager.get(SETTING_KEYS.ENABLE_SCENE_CONTROL) !== false;
+}
+
 export function registerSceneControlHook(env = globalThis, getTriggerz) {
   env.Hooks.on("getSceneControlButtons", (controls) => {
     const triggerz = getTriggerz();
+    if (!triggerz || !sceneControlEnabled(triggerz)) return controls;
     const tool = createOpenHubTool(triggerz, env);
-    injectControlGroup(controls, createControlGroup(tool, controls));
+    return injectControlGroup(controls, createControlGroup(tool, controls));
   });
 }
-

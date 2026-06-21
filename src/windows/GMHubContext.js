@@ -103,14 +103,27 @@ export function summarizeTrigger(trigger) {
   };
 }
 
-export function summarizeCondition(condition) {
+export function buildTriggerOptions(triggers) {
+  return triggers.map((trigger) => ({
+    value: trigger.id,
+    label: trigger.name && trigger.name !== trigger.id ? `${trigger.name} - ${trigger.label}` : trigger.label
+  }));
+}
+
+export function summarizeCondition(condition, triggerLabels = new Map()) {
   const changeCount = asArray(condition.changes).length;
+  const applyTriggerId = condition.applyTriggerId ?? "";
+  const removeTriggerId = condition.removeTriggerId ?? "";
   return {
     ...condition,
     label: condition.name ?? condition.id,
     img: condition.img ?? "icons/svg/aura.svg",
     description: condition.description ?? "",
-    changeSummary: changeCount ? `${changeCount} change${changeCount === 1 ? "" : "s"}` : "No changes"
+    changeSummary: changeCount ? `${changeCount} change${changeCount === 1 ? "" : "s"}` : "No changes",
+    applyTriggerId,
+    removeTriggerId,
+    applyTriggerSummary: applyTriggerId ? triggerLabels.get(applyTriggerId) ?? applyTriggerId : "",
+    removeTriggerSummary: removeTriggerId ? triggerLabels.get(removeTriggerId) ?? removeTriggerId : ""
   };
 }
 
@@ -141,7 +154,10 @@ export function buildSelectedTokens(env = globalThis, conditionOptions = []) {
 
 export function buildGMHubContext({ dataManager, env = globalThis } = {}) {
   const data = dataManager.exportData();
-  const conditions = data.conditions.map(summarizeCondition);
+  const triggers = data.triggers.map(summarizeTrigger);
+  const triggerOptions = buildTriggerOptions(triggers);
+  const triggerLabels = new Map(triggerOptions.map((trigger) => [trigger.value, trigger.label]));
+  const conditions = data.conditions.map((condition) => summarizeCondition(condition, triggerLabels));
   const statusOptions = buildStatusOptions(env);
   const conditionOptions = buildConditionOptions(conditions, statusOptions);
   const selectedTokens = buildSelectedTokens(env, conditionOptions);
@@ -152,8 +168,9 @@ export function buildGMHubContext({ dataManager, env = globalThis } = {}) {
     triggerCount: data.triggers.length,
     conditionCount: data.conditions.length,
     selectedTokenCount: selectedTokens.length,
-    triggers: data.triggers.map(summarizeTrigger),
+    triggers,
     conditions,
+    triggerOptions,
     conditionOptions,
     statusOptions,
     selectedTokens,

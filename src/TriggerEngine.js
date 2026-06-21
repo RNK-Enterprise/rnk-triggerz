@@ -75,6 +75,19 @@ export function normalizeTrigger(trigger) {
   };
 }
 
+export function linkedActionsForTrigger(trigger, conditions = []) {
+  const actions = [];
+  for (const condition of asArray(conditions)) {
+    if (condition?.applyTriggerId === trigger.id) {
+      actions.push({ type: ACTION_TYPES.APPLY_CONDITION, condition });
+    }
+    if (condition?.removeTriggerId === trigger.id) {
+      actions.push({ type: ACTION_TYPES.REMOVE_CONDITION, condition });
+    }
+  }
+  return actions;
+}
+
 export function evaluateTrigger(trigger, entity, update) {
   const prepared = normalizeTrigger(trigger);
   if (prepared.pcOnly && !entity?.hasPlayerOwner) return false;
@@ -102,12 +115,12 @@ export class TriggerEngine {
     };
   }
 
-  async processUpdate(entity, update, triggers = [], actionTarget = entity) {
+  async processUpdate(entity, update, triggers = [], actionTarget = entity, conditions = []) {
     const matched = [];
     for (const trigger of triggers.map(normalizeTrigger)) {
       if (!evaluateTrigger(trigger, entity, update)) continue;
       matched.push(trigger);
-      for (const action of trigger.actions) {
+      for (const action of [...trigger.actions, ...linkedActionsForTrigger(trigger, conditions)]) {
         await this.adapter.runAction(actionTarget, this.resolveAction(action), this.macroRunner);
       }
     }

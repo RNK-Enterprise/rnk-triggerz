@@ -136,12 +136,12 @@ export class RNKTriggerz {
   }
 
   async processActorUpdate(actor, updateData) {
-    return this.triggerEngine.processUpdate(actorUpdateEntity(actor, updateData), updateData, this.dataManager.getTriggers(), actor);
+    return this.triggerEngine.processUpdate(actorUpdateEntity(actor, updateData), updateData, this.dataManager.getTriggers(), actor, this.dataManager.getConditions());
   }
 
   async processTokenUpdate(tokenDocument, updateData) {
     const actor = tokenDocument?.actor ?? tokenDocument;
-    return this.triggerEngine.processUpdate(tokenActorEntity(tokenDocument, updateData), tokenActorUpdateData(updateData), this.dataManager.getTriggers(), actor);
+    return this.triggerEngine.processUpdate(tokenActorEntity(tokenDocument, updateData), tokenActorUpdateData(updateData), this.dataManager.getTriggers(), actor, this.dataManager.getConditions());
   }
 
   exportData() {

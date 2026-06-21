@@ -19,6 +19,7 @@ import {
   buildGMHubContext,
   buildSelectedTokens,
   buildStatusOptions,
+  buildTriggerOptions,
   cleanStatusLabel,
   summarizeCondition,
   summarizeTrigger,
@@ -41,7 +42,7 @@ function createStore() {
         actions: [{ type: ACTION_TYPES.APPLY_CONDITION, condition: "c1" }]
       }
     ],
-    conditions: [{ id: "c1", name: "Cold", img: "cold.svg" }]
+    conditions: [{ id: "c1", name: "Cold", img: "cold.svg", applyTriggerId: "t1" }]
   };
   return {
     state,
@@ -147,7 +148,7 @@ test("GM hub context builds usable render data", () => {
     ]
   });
   const context = buildGMHubContext({ dataManager: createStore(), env });
-  assert.equal(context.version, "1.0.1");
+  assert.equal(context.version, "1.0.2");
   assert.equal(context.moduleMode, "localized:RNKTRIGGERZ.GMHub.SystemAgnostic");
   assert.equal("systemId" in context, false);
   assert.equal(context.mode, "GM");
@@ -158,6 +159,8 @@ test("GM hub context builds usable render data", () => {
   assert.equal(context.selectedTokens[0].assignmentSummary, "Cold");
   assert.equal(context.triggers[0].actionSummary, "c1");
   assert.equal(context.conditions[0].label, "Cold");
+  assert.equal(context.conditions[0].applyTriggerSummary, "T1 - system.hp.value lte 50%");
+  assert.deepEqual(context.triggerOptions, [{ value: "t1", label: "T1 - system.hp.value lte 50%" }]);
   assert.equal(context.conditionOptions.some((option) => option.value === "stunned"), true);
   assert.equal(context.pathOptions[0].label.startsWith("localized:"), true);
   assert.equal(context.effectModeOptions[5].label.startsWith("localized:"), true);
@@ -197,6 +200,7 @@ test("context helpers summarize statuses, conditions, triggers, and tokens", () 
     { value: "stunned", label: "Stunned", source: "status" }
   ]);
   assert.deepEqual(buildConditionOptions([{ id: "plain" }], []), [{ value: "plain", label: "plain", source: "saved" }]);
+  assert.deepEqual(buildTriggerOptions([{ id: "same", name: "same", label: "system.hp.value eq 1" }]), [{ value: "same", label: "system.hp.value eq 1" }]);
   assert.equal(summarizeTrigger({ id: "empty", path: "x", operator: "eq", value: 1 }).actionSummary, "No actions");
   assert.equal(summarizeTrigger({ id: "labeled", label: "Existing Label", actions: [{ type: "customAction" }] }).label, "Existing Label");
   assert.equal(summarizeTrigger({ id: "typed", path: "x", operator: "eq", value: 1, actions: [{ type: "customAction" }] }).actionSummary, "customAction");
@@ -206,8 +210,27 @@ test("context helpers summarize statuses, conditions, triggers, and tokens", () 
     label: "plain",
     img: "icons/svg/aura.svg",
     description: "",
-    changeSummary: "No changes"
+    changeSummary: "No changes",
+    applyTriggerId: "",
+    removeTriggerId: "",
+    applyTriggerSummary: "",
+    removeTriggerSummary: ""
   });
+  assert.equal(summarizeCondition({
+    id: "linked",
+    applyTriggerId: "apply",
+    removeTriggerId: "remove"
+  }, new Map([["apply", "Apply Label"]])).applyTriggerSummary, "Apply Label");
+  assert.equal(summarizeCondition({
+    id: "linked",
+    applyTriggerId: "apply",
+    removeTriggerId: "remove"
+  }).applyTriggerSummary, "apply");
+  assert.equal(summarizeCondition({
+    id: "linked",
+    applyTriggerId: "apply",
+    removeTriggerId: "remove"
+  }, new Map([["apply", "Apply Label"]])).removeTriggerSummary, "remove");
   assert.equal(summarizeCondition({ id: "one", changes: [{ key: "x" }] }).changeSummary, "1 change");
   assert.equal(summarizeCondition({ id: "two", description: "Two changes", changes: [{ key: "x" }, { key: "y" }] }).changeSummary, "2 changes");
   assert.deepEqual(actorAssignedConditionIds({ getFlag: () => ["dead"] }), ["dead"]);
@@ -260,6 +283,8 @@ test("form helpers parse builder inputs", () => {
     conditionName: "Custom",
     conditionImg: "custom.svg",
     conditionDescription: "Custom condition",
+    applyTriggerId: "apply-trigger",
+    removeTriggerId: "remove-trigger",
     changeKey1: "system.rank",
     changeMode1: "5",
     changeValue1: "elite",
@@ -270,7 +295,9 @@ test("form helpers parse builder inputs", () => {
     img: "custom.svg",
     description: "Custom condition",
     changes: [{ key: "system.rank", mode: 5, value: "elite", priority: 30 }],
-    homebrew: true
+    homebrew: true,
+    applyTriggerId: "apply-trigger",
+    removeTriggerId: "remove-trigger"
   });
   assert.deepEqual(buildConditionPayload(createForm({ statusId: "labeled" }), { id: "labeled", label: "Labeled" }), {
     id: "labeled",

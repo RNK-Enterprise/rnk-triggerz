@@ -40,6 +40,7 @@ test("DataManager registers settings once and reads cloned defaults", () => {
   const store = new DataManager({ game });
   assert.equal(store.registerSettings(), SETTING_DEFINITIONS.length);
   assert.equal(game.settings.calls.length, SETTING_DEFINITIONS.length);
+  assert.equal(game.settings.settings.get("rnk-triggerz.enableSceneControl").requiresReload, true);
   assert.equal(store.registerSettings(), SETTING_DEFINITIONS.length);
   assert.equal(game.settings.calls.length, SETTING_DEFINITIONS.length);
   const triggers = store.getTriggers();

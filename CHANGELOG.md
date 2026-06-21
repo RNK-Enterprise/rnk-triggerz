@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 - 2026-06-21
+
+- Added condition-level Apply Trigger and Remove Trigger links so saved conditions can react to existing triggers.
+- Fixed the scene-control launcher to honor the Foundry settings toggle.
+
 ## 1.0.1 - 2026-06-21
 
 - Added trigger comparisons where the value can resolve from an actor data path.

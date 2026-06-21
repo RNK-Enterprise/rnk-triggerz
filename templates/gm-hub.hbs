@@ -85,6 +85,26 @@
         <span>{{localize "RNKTRIGGERZ.GMHub.Description"}}</span>
         <textarea name="conditionDescription" rows="3" placeholder="{{localize "RNKTRIGGERZ.GMHub.DescriptionPlaceholder"}}"></textarea>
       </label>
+      <div class="rnk-triggerz-inline">
+        <label>
+          <span>{{localize "RNKTRIGGERZ.GMHub.ApplyTrigger"}}</span>
+          <select name="applyTriggerId">
+            <option value="">{{localize "RNKTRIGGERZ.GMHub.NoTrigger"}}</option>
+            {{#each triggerOptions}}
+              <option value="{{value}}">{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+        <label>
+          <span>{{localize "RNKTRIGGERZ.GMHub.RemoveTrigger"}}</span>
+          <select name="removeTriggerId">
+            <option value="">{{localize "RNKTRIGGERZ.GMHub.NoTrigger"}}</option>
+            {{#each triggerOptions}}
+              <option value="{{value}}">{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+      </div>
       <details class="rnk-triggerz-effect-builder">
         <summary>{{localize "RNKTRIGGERZ.GMHub.HomebrewChanges"}}</summary>
         <fieldset>
@@ -273,6 +293,8 @@
               <strong>{{label}}</strong>
               <span>{{id}}</span>
               <small>{{changeSummary}}</small>
+              {{#if applyTriggerSummary}}<small>{{localize "RNKTRIGGERZ.GMHub.ApplyTrigger"}}: {{applyTriggerSummary}}</small>{{/if}}
+              {{#if removeTriggerSummary}}<small>{{localize "RNKTRIGGERZ.GMHub.RemoveTrigger"}}: {{removeTriggerSummary}}</small>{{/if}}
               {{#if description}}<small>{{description}}</small>{{/if}}
             </div>
             <button type="button" data-action="delete-condition" data-id="{{id}}">{{localize "RNKTRIGGERZ.GMHub.Delete"}}</button>

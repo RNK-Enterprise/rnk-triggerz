@@ -10,6 +10,7 @@ import {
   createDefaultTrigger,
   evaluateTrigger,
   isNumericValue,
+  linkedActionsForTrigger,
   normalizeTrigger,
   resolvePathValue,
   resolveTriggerRightValue,
@@ -77,6 +78,36 @@ test("evaluateTrigger handles ownership, missing updates, zero guards, and opera
   assert.equal(evaluateTrigger({ id: "csb", path: "system.props.HP", value: "system.props.midlife", operator: OPERATORS.LTE }, csbEntity, { "system.props.HP": 4 }), true);
   assert.equal(evaluateTrigger({ id: "csb-token", path: "system.props.HP", value: "system.props.midlife", operator: OPERATORS.GT }, csbEntity, { "props.HP": 6 }), true);
   assert.equal(evaluateTrigger({ id: "csb-high", path: "system.props.HP", value: "system.props.midlife", operator: OPERATORS.LTE }, csbEntity, { "system.props.HP": "10" }), false);
+});
+
+test("linkedActionsForTrigger maps condition apply and remove trigger ids", async () => {
+  assert.deepEqual(linkedActionsForTrigger({ id: "hit" }, [
+    { id: "apply", applyTriggerId: "hit" },
+    { id: "remove", removeTriggerId: "hit" },
+    { id: "both", applyTriggerId: "hit", removeTriggerId: "hit" },
+    { id: "skip", applyTriggerId: "miss", removeTriggerId: "miss" },
+    null
+  ]), [
+    { type: ACTION_TYPES.APPLY_CONDITION, condition: { id: "apply", applyTriggerId: "hit" } },
+    { type: ACTION_TYPES.REMOVE_CONDITION, condition: { id: "remove", removeTriggerId: "hit" } },
+    { type: ACTION_TYPES.APPLY_CONDITION, condition: { id: "both", applyTriggerId: "hit", removeTriggerId: "hit" } },
+    { type: ACTION_TYPES.REMOVE_CONDITION, condition: { id: "both", applyTriggerId: "hit", removeTriggerId: "hit" } }
+  ]);
+  const actions = [];
+  const engine = new TriggerEngine({
+    adapter: {
+      async runAction(target, action) {
+        actions.push({ target, action });
+      }
+    }
+  });
+  await engine.processUpdate(entity, { system: { hp: { value: 4 } } }, [
+    { id: "hit", path: "system.hp.value", value: 4, actions: [] }
+  ], "target", [{ id: "cold", applyTriggerId: "hit" }, { id: "warm", removeTriggerId: "hit" }]);
+  assert.deepEqual(actions.map((entry) => [entry.target, entry.action.type, entry.action.condition.id]), [
+    ["target", ACTION_TYPES.APPLY_CONDITION, "cold"],
+    ["target", ACTION_TYPES.REMOVE_CONDITION, "warm"]
+  ]);
 });
 
 test("TriggerEngine executes matched actions only", async () => {

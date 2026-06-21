@@ -51,7 +51,7 @@ export function buildConditionPayload(form, status) {
   const statusId = readText(form, "statusId");
   const id = customId || statusId;
   const changes = buildEffectChanges(form);
-  return {
+  const condition = {
     id,
     name: readText(form, "conditionName") || statusDisplayLabel(status) || id,
     img: readText(form, "conditionImg") || status?.img || "icons/svg/aura.svg",
@@ -59,6 +59,11 @@ export function buildConditionPayload(form, status) {
     changes,
     homebrew: Boolean(customId || changes.length)
   };
+  const applyTriggerId = readText(form, "applyTriggerId");
+  const removeTriggerId = readText(form, "removeTriggerId");
+  if (applyTriggerId) condition.applyTriggerId = applyTriggerId;
+  if (removeTriggerId) condition.removeTriggerId = removeTriggerId;
+  return condition;
 }
 
 export function buildTriggerPayload(form) {

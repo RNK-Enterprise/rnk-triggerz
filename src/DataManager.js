@@ -8,7 +8,8 @@ export const SETTING_DEFINITIONS = [
     config: true,
     type: Boolean,
     name: "RNKTRIGGERZ.Settings.EnableSceneControl.Name",
-    hint: "RNKTRIGGERZ.Settings.EnableSceneControl.Hint"
+    hint: "RNKTRIGGERZ.Settings.EnableSceneControl.Hint",
+    requiresReload: true
   },
   {
     key: SETTING_KEYS.TRIGGERS,
