@@ -1,0 +1,313 @@
+<section class="rnk-triggerz-hub">
+  <header class="rnk-triggerz-header">
+    <div>
+      <h2>{{localize "RNKTRIGGERZ.GMHub.Title"}}</h2>
+      <p>{{moduleMode}} | {{mode}} | v{{version}}</p>
+    </div>
+    <button type="button" data-action="refresh">{{localize "RNKTRIGGERZ.GMHub.Refresh"}}</button>
+  </header>
+
+  <div class="rnk-triggerz-summary">
+    <div class="rnk-triggerz-stat">
+      <strong>{{triggerCount}}</strong>
+      <span>{{localize "RNKTRIGGERZ.GMHub.Triggers"}}</span>
+    </div>
+    <div class="rnk-triggerz-stat">
+      <strong>{{conditionCount}}</strong>
+      <span>{{localize "RNKTRIGGERZ.GMHub.Conditions"}}</span>
+    </div>
+    <div class="rnk-triggerz-stat">
+      <strong>{{selectedTokenCount}}</strong>
+      <span>{{localize "RNKTRIGGERZ.GMHub.Selected"}}</span>
+    </div>
+  </div>
+
+  <section class="rnk-triggerz-panel">
+    <h3>{{localize "RNKTRIGGERZ.GMHub.SelectedTokens"}}</h3>
+    <div class="rnk-triggerz-selected-grid">
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.Condition"}}</span>
+        <select data-rnk-triggerz-selected-condition>
+          {{#each conditionOptions}}
+            <option value="{{value}}">{{label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.CustomCondition"}}</span>
+        <input type="text" data-rnk-triggerz-selected-condition-custom placeholder="condition-id">
+      </label>
+      <div class="rnk-triggerz-actions">
+        <button type="button" data-action="assign-selected">{{localize "RNKTRIGGERZ.GMHub.Assign"}}</button>
+        <button type="button" data-action="unassign-selected">{{localize "RNKTRIGGERZ.GMHub.Unassign"}}</button>
+        <button type="button" data-action="apply-selected">{{localize "RNKTRIGGERZ.GMHub.Apply"}}</button>
+        <button type="button" data-action="remove-selected">{{localize "RNKTRIGGERZ.GMHub.Remove"}}</button>
+        <button type="button" data-action="toggle-selected">{{localize "RNKTRIGGERZ.GMHub.Toggle"}}</button>
+      </div>
+    </div>
+    <ol class="rnk-triggerz-token-list">
+      {{#each selectedTokens}}
+        <li>
+          <strong>{{name}}</strong>
+          <span>{{assignmentSummary}}</span>
+        </li>
+      {{else}}
+        <li>{{localize "RNKTRIGGERZ.GMHub.NoSelectedTokens"}}</li>
+      {{/each}}
+    </ol>
+  </section>
+
+  <section class="rnk-triggerz-grid">
+    <form class="rnk-triggerz-panel rnk-triggerz-form" data-rnk-triggerz-condition-form>
+      <h3>{{localize "RNKTRIGGERZ.GMHub.ConditionBuilder"}}</h3>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.StatusEffect"}}</span>
+        <select name="statusId">
+          <option value="">{{localize "RNKTRIGGERZ.GMHub.CustomStatus"}}</option>
+          {{#each statusOptions}}
+            <option value="{{value}}">{{label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.ConditionId"}}</span>
+        <input type="text" name="conditionId" placeholder="condition-id">
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.ConditionName"}}</span>
+        <input type="text" name="conditionName" placeholder="Condition Name">
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.IconPath"}}</span>
+        <input type="text" name="conditionImg" placeholder="icons/svg/aura.svg">
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.Description"}}</span>
+        <textarea name="conditionDescription" rows="3" placeholder="{{localize "RNKTRIGGERZ.GMHub.DescriptionPlaceholder"}}"></textarea>
+      </label>
+      <details class="rnk-triggerz-effect-builder">
+        <summary>{{localize "RNKTRIGGERZ.GMHub.HomebrewChanges"}}</summary>
+        <fieldset>
+          <legend>{{localize "RNKTRIGGERZ.GMHub.HomebrewChangesLegend"}}</legend>
+          <div class="rnk-triggerz-change-row">
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeKey"}}</span>
+              <input type="text" name="changeKey1" placeholder="system.path.value">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeMode"}}</span>
+              <select name="changeMode1">
+                {{#each effectModeOptions}}
+                  <option value="{{value}}">{{label}}</option>
+                {{/each}}
+              </select>
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeValue"}}</span>
+              <input type="text" name="changeValue1" placeholder="1">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangePriority"}}</span>
+              <input type="number" name="changePriority1" placeholder="20">
+            </label>
+          </div>
+          <div class="rnk-triggerz-change-row">
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeKey"}}</span>
+              <input type="text" name="changeKey2" placeholder="system.path.value">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeMode"}}</span>
+              <select name="changeMode2">
+                {{#each effectModeOptions}}
+                  <option value="{{value}}">{{label}}</option>
+                {{/each}}
+              </select>
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeValue"}}</span>
+              <input type="text" name="changeValue2" placeholder="1">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangePriority"}}</span>
+              <input type="number" name="changePriority2" placeholder="20">
+            </label>
+          </div>
+          <div class="rnk-triggerz-change-row">
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeKey"}}</span>
+              <input type="text" name="changeKey3" placeholder="system.path.value">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeMode"}}</span>
+              <select name="changeMode3">
+                {{#each effectModeOptions}}
+                  <option value="{{value}}">{{label}}</option>
+                {{/each}}
+              </select>
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeValue"}}</span>
+              <input type="text" name="changeValue3" placeholder="1">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangePriority"}}</span>
+              <input type="number" name="changePriority3" placeholder="20">
+            </label>
+          </div>
+          <div class="rnk-triggerz-change-row">
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeKey"}}</span>
+              <input type="text" name="changeKey4" placeholder="system.path.value">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeMode"}}</span>
+              <select name="changeMode4">
+                {{#each effectModeOptions}}
+                  <option value="{{value}}">{{label}}</option>
+                {{/each}}
+              </select>
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangeValue"}}</span>
+              <input type="text" name="changeValue4" placeholder="1">
+            </label>
+            <label>
+              <span>{{localize "RNKTRIGGERZ.GMHub.ChangePriority"}}</span>
+              <input type="number" name="changePriority4" placeholder="20">
+            </label>
+          </div>
+        </fieldset>
+      </details>
+      <button type="submit">{{localize "RNKTRIGGERZ.GMHub.SaveCondition"}}</button>
+    </form>
+
+    <form class="rnk-triggerz-panel rnk-triggerz-form" data-rnk-triggerz-trigger-form>
+      <h3>{{localize "RNKTRIGGERZ.GMHub.TriggerBuilder"}}</h3>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.TriggerName"}}</span>
+        <input type="text" name="triggerName" placeholder="Example Trigger">
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.TriggerId"}}</span>
+        <input type="text" name="triggerId" placeholder="auto-generated">
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.ActorPath"}}</span>
+        <select name="triggerPath">
+          {{#each pathOptions}}
+            <option value="{{value}}">{{label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.CustomPath"}}</span>
+        <input type="text" name="triggerPathCustom" placeholder="system.hp.value">
+      </label>
+      <div class="rnk-triggerz-inline">
+        <label>
+          <span>{{localize "RNKTRIGGERZ.GMHub.Operator"}}</span>
+          <select name="operator">
+            {{#each operatorOptions}}
+              <option value="{{value}}">{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+        <label>
+          <span>{{localize "RNKTRIGGERZ.GMHub.Value"}}</span>
+          <input type="text" name="value" placeholder="target-value">
+        </label>
+      </div>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.ComparePath"}}</span>
+        <input type="text" name="comparePath" placeholder="system.path.max">
+      </label>
+      <div class="rnk-triggerz-inline">
+        <label>
+          <span>{{localize "RNKTRIGGERZ.GMHub.Scope"}}</span>
+          <select name="scope">
+            {{#each scopeOptions}}
+              <option value="{{value}}">{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+        <label class="rnk-triggerz-check">
+          <input type="checkbox" name="notZero">
+          <span>{{localize "RNKTRIGGERZ.GMHub.NotZero"}}</span>
+        </label>
+      </div>
+      <div class="rnk-triggerz-inline">
+        <label>
+          <span>{{localize "RNKTRIGGERZ.GMHub.Action"}}</span>
+          <select name="actionType">
+            {{#each actionOptions}}
+              <option value="{{value}}">{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+        <label>
+          <span>{{localize "RNKTRIGGERZ.GMHub.ActionCondition"}}</span>
+          <select name="actionCondition">
+            {{#each conditionOptions}}
+              <option value="{{value}}">{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+      </div>
+      <label>
+        <span>{{localize "RNKTRIGGERZ.GMHub.MacroId"}}</span>
+        <input type="text" name="macroId" placeholder="macro-id-for-run-macro">
+      </label>
+      <button type="submit">{{localize "RNKTRIGGERZ.GMHub.SaveTrigger"}}</button>
+    </form>
+  </section>
+
+  <section class="rnk-triggerz-grid">
+    <section class="rnk-triggerz-panel">
+      <h3>{{localize "RNKTRIGGERZ.GMHub.ConfiguredConditions"}}</h3>
+      <ol class="rnk-triggerz-list">
+        {{#each conditions}}
+          <li>
+            <img src="{{img}}" alt="">
+            <div>
+              <strong>{{label}}</strong>
+              <span>{{id}}</span>
+              <small>{{changeSummary}}</small>
+              {{#if description}}<small>{{description}}</small>{{/if}}
+            </div>
+            <button type="button" data-action="delete-condition" data-id="{{id}}">{{localize "RNKTRIGGERZ.GMHub.Delete"}}</button>
+          </li>
+        {{else}}
+          <li class="rnk-triggerz-empty">{{localize "RNKTRIGGERZ.GMHub.NoConditions"}}</li>
+        {{/each}}
+      </ol>
+    </section>
+
+    <section class="rnk-triggerz-panel">
+      <h3>{{localize "RNKTRIGGERZ.GMHub.ConfiguredTriggers"}}</h3>
+      <ol class="rnk-triggerz-list">
+        {{#each triggers}}
+          <li>
+            <div>
+              <strong>{{name}}</strong>
+              <span>{{label}}</span>
+              <small>{{actionSummary}}</small>
+            </div>
+            <button type="button" data-action="delete-trigger" data-id="{{id}}">{{localize "RNKTRIGGERZ.GMHub.Delete"}}</button>
+          </li>
+        {{else}}
+          <li class="rnk-triggerz-empty">{{localize "RNKTRIGGERZ.GMHub.NoTriggers"}}</li>
+        {{/each}}
+      </ol>
+    </section>
+  </section>
+
+  <details class="rnk-triggerz-panel rnk-triggerz-advanced">
+    <summary>{{localize "RNKTRIGGERZ.GMHub.AdvancedImportExport"}}</summary>
+    <textarea data-rnk-triggerz-export rows="8">{{exportJson}}</textarea>
+    <div class="rnk-triggerz-actions">
+      <button type="button" data-action="export">{{localize "RNKTRIGGERZ.GMHub.Export"}}</button>
+      <button type="button" data-action="import">{{localize "RNKTRIGGERZ.GMHub.Import"}}</button>
+    </div>
+  </details>
+</section>
