@@ -68,6 +68,7 @@
   "RNKTRIGGERZ.Operators.LTE": "Less than or equal",
   "RNKTRIGGERZ.Operators.GT": "Greater than",
   "RNKTRIGGERZ.Operators.GTE": "Greater than or equal",
+  "RNKTRIGGERZ.Actions.None": "None",
   "RNKTRIGGERZ.Actions.ApplyCondition": "Apply condition",
   "RNKTRIGGERZ.Actions.RemoveCondition": "Remove condition",
   "RNKTRIGGERZ.Actions.ToggleCondition": "Toggle condition",
@@ -96,6 +97,9 @@
   "RNKTRIGGERZ.Notifications.ActorAssignmentsUpdated": "Actor condition assignments updated.",
   "RNKTRIGGERZ.Settings.EnableSceneControl.Name": "Enable Scene Control",
   "RNKTRIGGERZ.Settings.EnableSceneControl.Hint": "Show the RNK Triggerz scene control launcher.",
+  "RNKTRIGGERZ.Settings.GMHub.Name": "RNK Triggerz GM Hub",
+  "RNKTRIGGERZ.Settings.GMHub.Label": "Open GM Hub",
+  "RNKTRIGGERZ.Settings.GMHub.Hint": "Open the RNK Triggerz GM Hub from Configure Settings.",
   "RNKTRIGGERZ.Settings.Debug.Name": "Debug Logging",
   "RNKTRIGGERZ.Settings.Debug.Hint": "Enable extra RNK Triggerz console diagnostics."
 }

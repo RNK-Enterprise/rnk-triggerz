@@ -48,6 +48,16 @@ test("DataManager registers settings once and reads cloned defaults", () => {
   assert.deepEqual(store.getTriggers(), []);
 });
 
+test("DataManager registers settings menus once when Foundry supports them", () => {
+  const game = createGame();
+  const store = new DataManager({ game });
+  assert.equal(store.registerMenu("gmHub", { label: "Open" }), true);
+  assert.equal(store.registerMenu("gmHub", { label: "Open Again" }), false);
+  assert.equal(game.settings.menus.get("rnk-triggerz.gmHub").label, "Open");
+  assert.equal(game.settings.calls.filter((call) => call[0] === "registerMenu").length, 1);
+  assert.equal(new DataManager({ game: { settings: { register() {}, get() {}, set() {} } } }).registerMenu("missing", {}), false);
+});
+
 test("DataManager saves, exports, and imports trigger data", async () => {
   const game = createGame();
   const store = new DataManager({ game });

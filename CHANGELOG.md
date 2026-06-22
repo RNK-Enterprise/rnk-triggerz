@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.3 - 2026-06-22
+
+- Added a Configure Settings menu launcher for the RNK Triggerz GM Hub.
+- Added a `None` trigger action for triggers that only drive linked condition apply/remove rules.
+- Fixed CSB ActiveEffect math for `system.props.*` paths by converting add, multiply, and override values into CSB custom formulas.
+- Updated ActiveEffect value placeholders to show path/formula-friendly input.
+
 ## 1.0.2 - 2026-06-21
 
 - Added condition-level Apply Trigger and Remove Trigger links so saved conditions can react to existing triggers.

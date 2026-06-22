@@ -38,6 +38,16 @@ test("RNKTriggerz initializes services and exposes API methods", async () => {
   const triggerz = new RNKTriggerz({ env }).init();
   assert.equal(triggerz.id, "rnk-triggerz");
   assert.equal(env.game.rnkTriggerz, triggerz);
+  const gmHubMenu = env.game.settings.menus.get("rnk-triggerz.gmHub");
+  assert.equal(gmHubMenu.label, "RNKTRIGGERZ.Settings.GMHub.Label");
+  assert.equal(gmHubMenu.type.prototype instanceof env.foundry.applications.api.ApplicationV2, true);
+  const menuCalls = [];
+  triggerz.uiManager.openGMHub = (options) => {
+    menuCalls.push(options);
+    return "hub";
+  };
+  assert.equal(await new gmHubMenu.type().render(true), "hub");
+  assert.deepEqual(menuCalls, [{ force: true }]);
   assert.equal(triggerz.ready(), triggerz);
   assert.deepEqual(triggerz.exportData(), { moduleId: "rnk-triggerz", triggers: [], conditions: [] });
   await triggerz.importData({ triggers: [{ id: "t", path: "system.hp.value", value: 1 }], conditions: [] });

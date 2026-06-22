@@ -58,6 +58,15 @@ export class DataManager {
     return SETTING_DEFINITIONS.length;
   }
 
+  registerMenu(key, definition) {
+    const settings = this.requireSettings();
+    const fullKey = `${this.moduleId}.${key}`;
+    if (settings.menus?.has?.(fullKey)) return false;
+    if (typeof settings.registerMenu !== "function") return false;
+    settings.registerMenu(this.moduleId, key, definition);
+    return true;
+  }
+
   get(key) {
     const value = this.requireSettings().get(this.moduleId, key);
     return cloneData(value, this.env);

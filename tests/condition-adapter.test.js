@@ -38,6 +38,9 @@ test("makeEffectData builds stable ActiveEffect data", () => {
   assert.equal(makeEffectData(null, { name: "Nameless", img: "named.svg" }, { transfer: false }).name, "Nameless");
   assert.equal(makeEffectData(null).name, undefined);
   assert.equal(makeEffectData({ id: "plain" }).img, "icons/svg/aura.svg");
+  assert.deepEqual(makeEffectData({ id: "force", changes: [{ key: "system.props.force", mode: 2, value: "-1" }] }).changes, [
+    { key: "system.props.force", mode: 0, value: "${ current + (-1) }$" }
+  ]);
 });
 
 test("ConditionAdapter resolves actors, statuses, and existing effects", () => {

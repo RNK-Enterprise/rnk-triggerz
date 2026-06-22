@@ -5,15 +5,18 @@ automation, condition overlays, and GM workflow control.
 
 ## Current Build
 
-Version: 1.0.2
+Version: 1.0.3
 
 - Scene control launcher
 - Foundry settings toggle for the scene control launcher
+- GM hub settings menu launcher
 - GM hub shell
 - Trigger engine foundation
 - Trigger values can be literals, actor data paths, or percentages against a compare path
+- Triggers can be saved with no direct action for linked condition workflows
 - Conditions can link to existing Apply Trigger and Remove Trigger rules
 - Foundry ActiveEffect adapter
+- CSB ActiveEffect path math normalization
 - Custom System Builder status adapter path
 - Import/export storage layer
 - Bible-aligned `main.js` and `src/` architecture

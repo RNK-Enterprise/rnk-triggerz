@@ -1,6 +1,6 @@
 export const MODULE_ID = "rnk-triggerz";
 export const MODULE_TITLE = "RNK Triggerz";
-export const MODULE_VERSION = "1.0.2";
+export const MODULE_VERSION = "1.0.3";
 export const SOCKET_CHANNEL = `module.${MODULE_ID}`;
 
 export const SETTING_KEYS = Object.freeze({
@@ -10,11 +10,16 @@ export const SETTING_KEYS = Object.freeze({
   DEBUG: "debug"
 });
 
+export const SETTING_MENU_KEYS = Object.freeze({
+  GM_HUB: "gmHub"
+});
+
 export const ACTOR_FLAG_KEYS = Object.freeze({
   ASSIGNED_CONDITIONS: "assignedConditions"
 });
 
 export const ACTION_TYPES = Object.freeze({
+  NONE: "none",
   APPLY_CONDITION: "applyCondition",
   REMOVE_CONDITION: "removeCondition",
   TOGGLE_CONDITION: "toggleCondition",

@@ -1,6 +1,6 @@
 import { ConditionAdapter } from "./ConditionAdapter.js";
 import { DataManager } from "./DataManager.js";
-import { MODULE_ID } from "./constants.js";
+import { MODULE_ID, SETTING_MENU_KEYS } from "./constants.js";
 import { SocketHandler } from "./SocketHandler.js";
 import { TriggerEngine } from "./TriggerEngine.js";
 import { UIManager } from "./UIManager.js";
@@ -94,6 +94,20 @@ export function tokenActorEntity(tokenDocument, updateData = {}) {
   return entity;
 }
 
+export function createGMHubSettingsMenuClass(triggerz) {
+  const ApplicationV2 = triggerz.env.foundry.applications.api.ApplicationV2;
+  return class RNKTriggerzGMHubSettingsMenu extends ApplicationV2 {
+    static DEFAULT_OPTIONS = {
+      id: "rnk-triggerz-gm-hub-settings-menu",
+      window: { title: "RNKTRIGGERZ.GMHub.Title" }
+    };
+
+    async render() {
+      return triggerz.uiManager.openGMHub({ force: true });
+    }
+  };
+}
+
 export class RNKTriggerz {
   constructor({ env = globalThis } = {}) {
     this.env = env;
@@ -114,6 +128,14 @@ export class RNKTriggerz {
       env: this.env,
       dataManager: this.dataManager,
       conditionAdapter: this.conditionAdapter
+    });
+    this.dataManager.registerMenu(SETTING_MENU_KEYS.GM_HUB, {
+      name: "RNKTRIGGERZ.Settings.GMHub.Name",
+      label: "RNKTRIGGERZ.Settings.GMHub.Label",
+      hint: "RNKTRIGGERZ.Settings.GMHub.Hint",
+      icon: "fa-solid fa-bolt",
+      type: createGMHubSettingsMenuClass(this),
+      restricted: true
     });
     this.socketHandler = new SocketHandler({
       game: this.env.game,

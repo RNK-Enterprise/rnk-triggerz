@@ -1,15 +1,22 @@
 export function createSettings() {
   const settings = new Map();
+  const menus = new Map();
   const values = new Map();
   const calls = [];
   return {
     settings,
+    menus,
     calls,
     register(moduleId, key, definition) {
       const fullKey = `${moduleId}.${key}`;
       calls.push(["register", fullKey]);
       settings.set(fullKey, definition);
       values.set(fullKey, structuredClone(definition.default));
+    },
+    registerMenu(moduleId, key, definition) {
+      const fullKey = `${moduleId}.${key}`;
+      calls.push(["registerMenu", fullKey]);
+      menus.set(fullKey, { ...definition, key: fullKey, namespace: moduleId });
     },
     get(moduleId, key) {
       return values.get(`${moduleId}.${key}`);

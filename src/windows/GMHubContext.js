@@ -20,6 +20,7 @@ export const OPERATOR_OPTIONS = Object.freeze([
 ]);
 
 export const ACTION_OPTIONS = Object.freeze([
+  { value: ACTION_TYPES.NONE, labelKey: "RNKTRIGGERZ.Actions.None", fallback: "None" },
   { value: ACTION_TYPES.APPLY_CONDITION, labelKey: "RNKTRIGGERZ.Actions.ApplyCondition", fallback: "Apply condition" },
   { value: ACTION_TYPES.REMOVE_CONDITION, labelKey: "RNKTRIGGERZ.Actions.RemoveCondition", fallback: "Remove condition" },
   { value: ACTION_TYPES.TOGGLE_CONDITION, labelKey: "RNKTRIGGERZ.Actions.ToggleCondition", fallback: "Toggle condition" },

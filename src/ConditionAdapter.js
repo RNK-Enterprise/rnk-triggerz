@@ -1,4 +1,5 @@
 import { ACTION_TYPES, ACTOR_FLAG_KEYS, MODULE_ID } from "./constants.js";
+import { normalizeEffectChanges } from "./EffectValues.js";
 import { asArray, makeError } from "./utils.js";
 
 function conditionId(condition) {
@@ -43,7 +44,7 @@ export function makeEffectData(condition, status, options = {}) {
     img: status?.img ?? condition?.img ?? "icons/svg/aura.svg",
     description: condition?.description ?? "",
     statuses: id ? [id] : [],
-    changes: condition?.changes ?? [],
+    changes: normalizeEffectChanges(condition?.changes),
     disabled: false,
     transfer: options.transfer ?? false,
     flags: {

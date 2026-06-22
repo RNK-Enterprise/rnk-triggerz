@@ -148,7 +148,7 @@ test("GM hub context builds usable render data", () => {
     ]
   });
   const context = buildGMHubContext({ dataManager: createStore(), env });
-  assert.equal(context.version, "1.0.2");
+  assert.equal(context.version, "1.0.3");
   assert.equal(context.moduleMode, "localized:RNKTRIGGERZ.GMHub.SystemAgnostic");
   assert.equal("systemId" in context, false);
   assert.equal(context.mode, "GM");
@@ -163,6 +163,7 @@ test("GM hub context builds usable render data", () => {
   assert.deepEqual(context.triggerOptions, [{ value: "t1", label: "T1 - system.hp.value lte 50%" }]);
   assert.equal(context.conditionOptions.some((option) => option.value === "stunned"), true);
   assert.equal(context.pathOptions[0].label.startsWith("localized:"), true);
+  assert.equal(context.actionOptions[0].value, ACTION_TYPES.NONE);
   assert.equal(context.effectModeOptions[5].label.startsWith("localized:"), true);
   assert.equal(JSON.parse(context.exportJson).moduleId, "rnk-triggerz");
 });
@@ -355,7 +356,8 @@ test("buildTriggerPayload supports condition actions, macro actions, and generat
 
   const defaults = buildTriggerPayload(createForm({ triggerPath: "system.hp.value" }));
   assert.equal(defaults.operator, OPERATORS.EQ);
-  assert.equal(defaults.actions[0].type, ACTION_TYPES.APPLY_CONDITION);
+  assert.deepEqual(defaults.actions, []);
+  assert.equal(defaults.id, "system-hp-value-eq-none");
 });
 
 test("GMHubActions exports, imports, saves, deletes, and refreshes", async () => {

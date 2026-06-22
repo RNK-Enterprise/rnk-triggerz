@@ -1,5 +1,6 @@
 import { ConditionAdapter } from "../ConditionAdapter.js";
 import { ACTION_TYPES, OPERATORS } from "../constants.js";
+import { normalizeEffectChange } from "../EffectValues.js";
 import { normalizeTrigger } from "../TriggerEngine.js";
 import { asArray, localize } from "../utils.js";
 import { statusDisplayLabel } from "./GMHubContext.js";
@@ -36,12 +37,12 @@ export function buildEffectChanges(form, maxRows = 4) {
   for (let index = 1; index <= maxRows; index += 1) {
     const key = readText(form, `changeKey${index}`);
     if (!key) continue;
-    changes.push({
+    changes.push(normalizeEffectChange({
       key,
       mode: readNumber(form, `changeMode${index}`, 0),
       value: readText(form, `changeValue${index}`),
       priority: readNumber(form, `changePriority${index}`, 20)
-    });
+    }));
   }
   return changes;
 }
@@ -71,20 +72,22 @@ export function buildTriggerPayload(form) {
   const name = readText(form, "triggerName");
   const operator = readText(form, "operator") || OPERATORS.EQ;
   const value = readText(form, "value");
-  const actionType = readText(form, "actionType") || ACTION_TYPES.APPLY_CONDITION;
+  const actionType = readText(form, "actionType") || ACTION_TYPES.NONE;
   const comparePath = readText(form, "comparePath");
   const scope = readText(form, "scope");
+  const actions = [];
+  if (actionType === ACTION_TYPES.RUN_MACRO) {
+    actions.push({ type: actionType, macroId: readText(form, "macroId") });
+  } else if (actionType !== ACTION_TYPES.NONE) {
+    actions.push({ type: actionType, condition: readText(form, "actionCondition") });
+  }
   const trigger = {
     id: readText(form, "triggerId") || slugifyId(`${name || path}-${operator}-${value}-${actionType}`),
     name: name || slugifyId(path),
     path,
     operator,
     value,
-    actions: [
-      actionType === ACTION_TYPES.RUN_MACRO
-        ? { type: actionType, macroId: readText(form, "macroId") }
-        : { type: actionType, condition: readText(form, "actionCondition") }
-    ]
+    actions
   };
   if (comparePath) trigger.comparePath = comparePath;
   if (scope === "pc") trigger.pcOnly = true;
@@ -181,6 +184,12 @@ export class GMHubActions {
     if (!trigger.path) {
       this.notify("error", "RNKTRIGGERZ.Notifications.TriggerPathRequired", "Trigger path is required.");
       return null;
+    }
+    if (!action) {
+      const saved = await this.dataManager.upsertTrigger(normalizeTrigger(trigger));
+      this.notify("info", "RNKTRIGGERZ.Notifications.TriggerSaved", "Trigger saved.");
+      this.render();
+      return saved;
     }
     if (action.type === ACTION_TYPES.RUN_MACRO && !action.macroId) {
       this.notify("error", "RNKTRIGGERZ.Notifications.MacroRequired", "Macro ID is required.");
